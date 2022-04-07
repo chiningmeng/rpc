@@ -1,5 +1,7 @@
 package com.whc.rpc.remoting.transport.netty.server;
 
+import com.whc.rpc.remoting.transport.netty.codec.MessageDecoder;
+import com.whc.rpc.remoting.transport.netty.codec.MessageEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -26,6 +28,8 @@ public class NettyServer {
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
                     protected void initChannel(NioSocketChannel ch) {
+//                        ch.pipeline().addLast(new MessageEncoder());
+//                        ch.pipeline().addLast(new MessageDecoder());
                         ch.pipeline().addLast(new ServerHandler());
                     }
                 });

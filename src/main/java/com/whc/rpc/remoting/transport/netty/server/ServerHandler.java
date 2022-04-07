@@ -11,10 +11,9 @@ public class ServerHandler extends SimpleChannelInboundHandler {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf byteBuf = (ByteBuf) msg;
-
-        System.out.println(new Date() + "  :服务端读到数据 -》" + byteBuf.toString(Charset.forName("utf-8")));
-
-
+        System.out.println(new Date() + ": 服务端读到数据 -> " + byteBuf.toString(Charset.forName("utf-8")));
+        // 回复数据到客户端
+        System.out.println(new Date() + ": 服务端写出数据");
         ByteBuf out = getByteBuf(ctx);
         ctx.channel().writeAndFlush(out);
     }

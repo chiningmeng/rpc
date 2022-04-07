@@ -9,10 +9,14 @@ import java.util.Date;
 
 public class ClientHandler extends SimpleChannelInboundHandler {
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object msg) throws Exception {
-        ByteBuf byteBuf = (ByteBuf) msg;
+    protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+        System.out.println(new Date() + ": 客户端写出数据");
 
-        System.out.println(new Date() + ": 客户端写出数据 -> " + byteBuf.toString(Charset.forName("utf-8")));
+        // 1.获取数据
+        ByteBuf buffer = getByteBuf(ctx);
+
+        // 2.写数据
+        ctx.channel().writeAndFlush(buffer);
     }
 
     @Override
