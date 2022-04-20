@@ -1,0 +1,3 @@
+kyro=com.whc.remoting.serialize.kyro.KryoSerializer
+protostuff=com.whc.remoting.serialize.protostuff.ProtostuffSerializer
+hessian=com.whc.remoting.serialize.hessian.HessianSerializer

@@ -1,0 +1,36 @@
+Manifest-Version: 1.0
+Main-Class: 
+Class-Path: failureaccess-1.0.1.jar netty-codec-smtp-4.1.72.Final.jar sp
+ ring-beans-5.2.7.RELEASE.jar netty-resolver-dns-native-macos-4.1.72.Fin
+ al-osx-aarch_64.jar netty-transport-rxtx-4.1.72.Final.jar netty-codec-4
+ .1.72.Final.jar netty-codec-memcache-4.1.72.Final.jar netty-tcnative-cl
+ asses-2.0.46.Final.jar objenesis-2.5.1.jar netty-codec-xml-4.1.72.Final
+ .jar kryo-4.0.2.jar netty-codec-http-4.1.72.Final.jar spring-expression
+ -5.2.7.RELEASE.jar protostuff-runtime-1.7.2.jar netty-transport-native-
+ unix-common-4.1.72.Final.jar netty-codec-redis-4.1.72.Final.jar animal-
+ sniffer-annotations-1.17.jar netty-transport-udt-4.1.72.Final.jar curat
+ or-recipes-4.2.0.jar netty-3.10.6.Final.jar lombok-1.18.22.jar netty-co
+ dec-stomp-4.1.72.Final.jar netty-codec-socks-4.1.72.Final.jar j2objc-an
+ notations-1.1.jar listenablefuture-9999.0-empty-to-avoid-conflict-with-
+ guava.jar audience-annotations-0.5.0.jar netty-transport-sctp-4.1.72.Fi
+ nal.jar netty-transport-classes-kqueue-4.1.72.Final.jar netty-transport
+ -4.1.72.Final.jar hessian-4.0.65.jar jsr305-3.0.2.jar spring-aop-5.2.7.
+ RELEASE.jar netty-transport-native-epoll-4.1.72.Final-linux-aarch_64.ja
+ r netty-transport-native-kqueue-4.1.72.Final-osx-aarch_64.jar error_pro
+ ne_annotations-2.2.0.jar netty-resolver-dns-4.1.72.Final.jar spring-con
+ text-5.2.7.RELEASE.jar guava-27.0.1-jre.jar netty-resolver-4.1.72.Final
+ .jar protostuff-collectionschema-1.7.2.jar commons-cli-1.2.jar checker-
+ qual-2.5.2.jar curator-framework-4.2.0.jar asm-5.0.4.jar netty-transpor
+ t-native-epoll-4.1.72.Final-linux-x86_64.jar slf4j-api-1.7.25.jar log4j
+ -1.2.17.jar netty-resolver-dns-classes-macos-4.1.72.Final.jar netty-tra
+ nsport-classes-epoll-4.1.72.Final.jar spring-jcl-5.2.7.RELEASE.jar prot
+ ostuff-api-1.7.2.jar curator-client-4.2.0.jar zookeeper-3.5.4-beta.jar 
+ netty-codec-http2-4.1.72.Final.jar netty-resolver-dns-native-macos-4.1.
+ 72.Final-osx-x86_64.jar protostuff-core-1.7.2.jar netty-codec-haproxy-4
+ .1.72.Final.jar netty-codec-dns-4.1.72.Final.jar reflectasm-1.11.3.jar 
+ netty-common-4.1.72.Final.jar minlog-1.3.0.jar netty-transport-native-k
+ queue-4.1.72.Final-osx-x86_64.jar slf4j-simple-1.7.25.jar netty-all-4.1
+ .72.Final.jar netty-handler-4.1.72.Final.jar netty-codec-mqtt-4.1.72.Fi
+ nal.jar netty-buffer-4.1.72.Final.jar netty-handler-proxy-4.1.72.Final.
+ jar spring-core-5.2.7.RELEASE.jar
+
