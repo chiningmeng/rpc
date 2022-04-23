@@ -1,14 +1,10 @@
 package com.whc;
 
 import com.whc.annotation.RpcScan;
-import com.whc.config.RpcServiceConfig;
 import com.whc.remoting.transport.server.NettyServer;
-import com.whc.serviceImpl.HelloWorldServiceImpl;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Import;
-import org.springframework.stereotype.Component;
 
-@RpcScan(basePackage = {"com.whc"})
+@RpcScan
 public class ServiceMain {
     public static void main(String[] args) {
         // 通过Spring Bean初始化 服务注册

@@ -1,5 +1,7 @@
 package com.whc.remoting.transport.codec;
 
+import com.whc.compress.Compress;
+import com.whc.enums.CompressTypeEnum;
 import com.whc.enums.SerializationTypeEnum;
 import com.whc.remoting.dto.Message;
 import com.whc.remoting.dto.Request;
@@ -8,6 +10,7 @@ import com.whc.extensions.ExtensionLoader;
 import com.whc.remoting.constants.RpcConstants;
 import com.whc.remoting.serialize.Serializer;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,12 +30,36 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
         // initialBytesToStrip: 因为需要校验magic code，不跳过任何字节  故为0
         this(RpcConstants.MAX_FRAME_LENGTH, 5, 4, -9, 0);
     }
+    @Override
+    protected Object decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
+        Object decoded = super.decode(ctx, in);
+        if (decoded instanceof ByteBuf) {
+            ByteBuf frame = (ByteBuf) decoded;
+            if (frame.readableBytes() >= RpcConstants.TOTAL_LENGTH) {
+                try {
+                    return decodeFrame(frame);
+                } catch (Exception e) {
+                    log.error("Decode frame error!", e);
+                    throw e;
+                } finally {
+                    frame.release();
+                }
+            }
+
+        }
+        return decoded;
+    }
+
+
     private Object decodeFrame(ByteBuf in) {
+        // note: must read ByteBuf in order
         checkMagicNumber(in);
         checkVersion(in);
         int fullLength = in.readInt();
+        // build RpcMessage object
         byte messageType = in.readByte();
         byte codecType = in.readByte();
+        byte compressType = in.readByte();
         int requestId = in.readInt();
         Message rpcMessage = Message.builder()
                 .codec(codecType)
@@ -50,9 +77,16 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
         if (bodyLength > 0) {
             byte[] bs = new byte[bodyLength];
             in.readBytes(bs);
+            // decompress the bytes
+            String compressName = CompressTypeEnum.getName(compressType);
+            Compress compress = ExtensionLoader.getExtensionLoader(Compress.class)
+                    .getExtension(compressName);
+            bs = compress.decompress(bs);
+            // deserialize the object
             String codecName = SerializationTypeEnum.getName(rpcMessage.getCodec());
             log.info("codec name: [{}] ", codecName);
-            Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension(codecName);
+            Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class)
+                    .getExtension(codecName);
             if (messageType == RpcConstants.REQUEST_TYPE) {
                 Request tmpValue = serializer.deserialize(bs, Request.class);
                 rpcMessage.setData(tmpValue);
@@ -66,6 +100,7 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
     }
 
     private void checkVersion(ByteBuf in) {
+        // read the version and compare
         byte version = in.readByte();
         if (version != RpcConstants.VERSION) {
             throw new RuntimeException("version isn't compatible" + version);
@@ -73,7 +108,7 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
     }
 
     private void checkMagicNumber(ByteBuf in) {
-        // 读 4bit magic number
+        // read the first 4 bit, which is the magic number, and compare
         int len = RpcConstants.MAGIC_NUMBER.length;
         byte[] tmp = new byte[len];
         in.readBytes(tmp);

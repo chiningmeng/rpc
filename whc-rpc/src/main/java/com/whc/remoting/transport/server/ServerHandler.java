@@ -1,5 +1,6 @@
 package com.whc.remoting.transport.server;
 
+import com.whc.enums.CompressTypeEnum;
 import com.whc.enums.ResponseCodeEnum;
 import com.whc.enums.SerializationTypeEnum;
 import com.whc.factory.SingletonFactory;
@@ -35,7 +36,7 @@ public class ServerHandler extends SimpleChannelInboundHandler {
                 byte messageType = ((Message) msg).getMessageType();
                 Message rpcMessage = new Message();
                 rpcMessage.setCodec(SerializationTypeEnum.HESSIAN.getCode());
-//                rpcMessage.setCompress(CompressTypeEnum.GZIP.getCode());
+                rpcMessage.setCompress(CompressTypeEnum.GZIP.getCode());
                 if (messageType == RpcConstants.HEARTBEAT_REQUEST_TYPE) {
                     rpcMessage.setMessageType(RpcConstants.HEARTBEAT_RESPONSE_TYPE);
                     rpcMessage.setData(RpcConstants.PONG);
