@@ -4,6 +4,8 @@ import com.whc.enums.CompressTypeEnum;
 import com.whc.enums.ResponseCodeEnum;
 import com.whc.enums.SerializationTypeEnum;
 import com.whc.factory.SingletonFactory;
+import com.whc.monitor.Monitor;
+import com.whc.monitor.time.TimeLine;
 import com.whc.remoting.constants.RpcConstants;
 import com.whc.remoting.dto.Message;
 import com.whc.remoting.dto.Request;
@@ -29,37 +31,42 @@ public class ServerHandler extends SimpleChannelInboundHandler {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, Object requestMessage) throws Exception {
         try {
-            if (msg instanceof Message) {
-                log.info("server receive msg: [{}] ", msg);
-                byte messageType = ((Message) msg).getMessageType();
-                Message rpcMessage = new Message();
-                rpcMessage.setCodec(SerializationTypeEnum.HESSIAN.getCode());
-                rpcMessage.setCompress(CompressTypeEnum.GZIP.getCode());
+            if (requestMessage instanceof Message) {
+                log.info("server receive msg: [{}] ", requestMessage);
+                byte messageType = ((Message) requestMessage).getMessageType();
+                Message responseMessage = new Message();
+                //todo HESSIAN
+                responseMessage.setCodec(SerializationTypeEnum.HESSIAN.getCode());
+                responseMessage.setCompress(CompressTypeEnum.GZIP.getCode());
                 if (messageType == RpcConstants.HEARTBEAT_REQUEST_TYPE) {
-                    rpcMessage.setMessageType(RpcConstants.HEARTBEAT_RESPONSE_TYPE);
-                    rpcMessage.setData(RpcConstants.PONG);
+                    responseMessage.setMessageType(RpcConstants.HEARTBEAT_RESPONSE_TYPE);
+                    responseMessage.setData(RpcConstants.PONG);
                 } else {
-                    Request rpcRequest = (Request) ((Message) msg).getData();
-                    // Execute the target method (the method the client needs to execute) and return the method result
+                    Request rpcRequest = (Request) ((Message) requestMessage).getData();
+
+                    TimeLine timeLine = Monitor.getTimeLine(rpcRequest.getRequestId());
+                    timeLine.phaseStartWithTimeStamp(System.currentTimeMillis());
+                    // 执行服务端对应方法
                     Object result = rpcRequestHandler.handle(rpcRequest);
+                    timeLine.phaseEndAndNext(TimeLine.Phase.HANDLE);
                     log.info(String.format("server get result: %s", result.toString()));
-                    rpcMessage.setMessageType(RpcConstants.RESPONSE_TYPE);
+                    responseMessage.setMessageType(RpcConstants.RESPONSE_TYPE);
                     if (ctx.channel().isActive() && ctx.channel().isWritable()) {
                         Response<Object> rpcResponse = Response.success(result, rpcRequest.getRequestId());
-                        rpcMessage.setData(rpcResponse);
+                        responseMessage.setData(rpcResponse);
                     } else {
                         Response<Object> rpcResponse = Response.fail(ResponseCodeEnum.FAIL);
-                        rpcMessage.setData(rpcResponse);
+                        responseMessage.setData(rpcResponse);
                         log.error("not writable now, message dropped");
                     }
                 }
-                ctx.writeAndFlush(rpcMessage).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
+                ctx.writeAndFlush(responseMessage).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
             }
         } finally {
-            //Ensure that ByteBuf is released, otherwise there may be memory leaks
-            ReferenceCountUtil.release(msg);
+            //确保释放ByteBuf，防止内存泄露
+            ReferenceCountUtil.release(requestMessage);
         }
     }
 

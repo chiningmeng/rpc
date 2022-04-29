@@ -9,7 +9,6 @@ import org.springframework.core.type.AnnotationMetadata;
 
 /**
  * RpcScan import此类，在标注@RpcScan注解的类下 属性bean自动注入前调用
- *
  */
 @Slf4j
 public class CustomScannerRegistrar implements ImportBeanDefinitionRegistrar {

@@ -4,6 +4,8 @@ import com.whc.enums.CompressTypeEnum;
 import com.whc.enums.SerializationTypeEnum;
 import com.whc.extensions.ExtensionLoader;
 import com.whc.factory.SingletonFactory;
+import com.whc.monitor.Monitor;
+import com.whc.monitor.time.TimeLine;
 import com.whc.registry.ServiceDiscovery;
 import com.whc.remoting.constants.RpcConstants;
 import com.whc.remoting.dto.Message;
@@ -24,7 +26,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
-import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -84,12 +85,17 @@ public final class NettyClient implements RequestTransport {
 
     @Override
     public Object sendRpcRequest(Request rpcRequest) {
-        // build return value
+        TimeLine timeLine = Monitor.getTimeLine(rpcRequest.getRequestId());
+
+
+        // 构建服务端将返回的response（在ClientHandler中捕获到服务端返回的Message时，complete此response）
         CompletableFuture<Response<Object>> resultFuture = new CompletableFuture<>();
-        // get server address
-        InetSocketAddress inetSocketAddress = serviceDiscovery.lookupService(rpcRequest);
-        // get  server address related channel
+        // 获取服务端ip
+        InetSocketAddress inetSocketAddress = serviceDiscovery.lookUpService(rpcRequest);
+        // 获取ip所对应的Channel
         Channel channel = getChannel(inetSocketAddress);
+        timeLine.phaseEndAndNext(TimeLine.Phase.GET_CONNECT);
+
         if (channel.isActive()) {
             // put unprocessed request
             unprocessedRequests.put(rpcRequest.getRequestId(), resultFuture);
@@ -99,10 +105,13 @@ public final class NettyClient implements RequestTransport {
                     .messageType(RpcConstants.REQUEST_TYPE).build();
             channel.writeAndFlush(rpcMessage).addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
+                    //todo writeAndFlush 成功并不代表对端接受到了请求，返回值为 true 只能保证写入网络缓冲区成功，并不代表发送成功
+
                     log.info("client send message: [{}]", rpcMessage);
                 } else {
                     future.channel().close();
                     resultFuture.completeExceptionally(future.cause());
+                    timeLine.setTotalTime(RpcConstants.Failed);
                     log.error("Send failed:", future.cause());
                 }
             });

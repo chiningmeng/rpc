@@ -22,10 +22,10 @@ public class RpcServiceConfig {
     private Object service;
 
     public String getRpcServiceName() {
-        return this.getServiceName() + this.getGroup() + this.getVersion();
-    }
-
-    public String getServiceName() {
         return this.service.getClass().getInterfaces()[0].getCanonicalName();
     }
+
+//    public String getServiceName() {
+//        return this.service.getClass().getInterfaces()[0].getCanonicalName();
+//    }
 }

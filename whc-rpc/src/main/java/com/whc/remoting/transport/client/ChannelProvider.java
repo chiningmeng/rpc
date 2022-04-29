@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * store and get Channel object
- *
  */
 @Slf4j
 public class ChannelProvider {

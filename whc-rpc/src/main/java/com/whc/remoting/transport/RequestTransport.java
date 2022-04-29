@@ -9,6 +9,7 @@ import com.whc.remoting.dto.Request;
 public interface RequestTransport {
     /**
      * 发送请求，并返回结结果
+     *
      * @param rpcRequest
      * @return
      */

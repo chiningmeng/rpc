@@ -11,7 +11,6 @@ import java.net.UnknownHostException;
 
 /**
  * 服务端关闭时，注销发布过的服务
- *
  */
 @Slf4j
 public class CustomShutdownHook {

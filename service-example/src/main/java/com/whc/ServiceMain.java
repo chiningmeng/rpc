@@ -17,6 +17,8 @@ public class ServiceMain {
 //                .group("test1").version("version1").service(helloService2).build();
 //        nettyServer.registerService(rpcServiceConfig);
 
+//        NettyServer nettyServer = new NettyServer();
+//        nettyServer.registerService(rpcServiceConfig);
         nettyServer.start();
     }
 }

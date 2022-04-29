@@ -15,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * https://github.com/apache/dubbo/blob/2d9583adf26a2d8bd6fb646243a9fe80a77e65d5/dubbo-cluster/src/main/java/org/apache/dubbo/rpc/cluster/loadbalance/ConsistentHashLoadBalance.java
- *
  */
 @Slf4j
 public class ConsistentHashLoadBalance extends AbstractLoadBalance {

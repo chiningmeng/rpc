@@ -35,6 +35,7 @@ public final class ExtensionLoader<T> {
 
     /**
      * 获取ExtensionLoader ： 先从缓存中取已加载好的，若无则加载并放入缓存中
+     *
      * @param type
      * @param <S>
      * @return
@@ -60,6 +61,7 @@ public final class ExtensionLoader<T> {
 
     /**
      * 返回指定名称所对应的实现
+     *
      * @param name
      * @return
      */
@@ -89,6 +91,7 @@ public final class ExtensionLoader<T> {
 
     /**
      * 加载所有T类扩展，返回指定名称所对应的实现
+     *
      * @param name
      * @return
      */
@@ -111,6 +114,7 @@ public final class ExtensionLoader<T> {
 
     /**
      * 获取所有扩展类
+     *
      * @return
      */
     private Map<String, Class<?>> getExtensionClassMap() {
@@ -132,7 +136,6 @@ public final class ExtensionLoader<T> {
     }
 
     /**
-     *
      * @param extensionClassMap
      */
     private void loadDirectory(Map<String, Class<?>> extensionClassMap) {

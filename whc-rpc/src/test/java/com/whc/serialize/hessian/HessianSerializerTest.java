@@ -17,14 +17,10 @@ class HessianSerializerTest {
                 .serviceClassName("com.whc.service")
                 .paramTypes(new Class<?>[]{String.class, String.class})
                 .requestId(UUID.randomUUID().toString())
-                .group("group1")
-                .version("version1")
                 .build();
         HessianSerializer hessianSerializer = new HessianSerializer();
         byte[] bytes = hessianSerializer.serialize(target);
         Request actual = hessianSerializer.deserialize(bytes, Request.class);
-        assertEquals(target.getGroup(), actual.getGroup());
-        assertEquals(target.getVersion(), actual.getVersion());
         assertEquals(target.getRequestId(), actual.getRequestId());
     }
 }

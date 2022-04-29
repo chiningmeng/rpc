@@ -6,7 +6,7 @@ import java.util.Enumeration;
 
 public class GetTypeTest {
     @Test
-    public void test(){
+    public void test() {
         System.out.println(Serializer.class.getName());
     }
 

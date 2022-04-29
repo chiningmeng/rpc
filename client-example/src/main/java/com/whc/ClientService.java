@@ -16,7 +16,7 @@ public class ClientService {
         MessageDTO messageDTO = new MessageDTO(a, b);
         Integer result = helloWorldService.add(messageDTO);
         log.info("result is [{}]", result);
-       return result;
+        return result;
     }
 
 }

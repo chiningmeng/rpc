@@ -5,7 +5,6 @@ import com.whc.config.RpcServiceConfig;
 
 /**
  * 存储&提供服务
- *
  */
 public interface ServiceProvider {
 

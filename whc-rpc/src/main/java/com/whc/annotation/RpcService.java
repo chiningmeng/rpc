@@ -5,7 +5,6 @@ import java.lang.annotation.*;
 
 /**
  * 标记服务接口的实现
- *
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

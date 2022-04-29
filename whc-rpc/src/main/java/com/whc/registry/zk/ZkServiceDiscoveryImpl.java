@@ -5,6 +5,8 @@ import com.whc.enums.RpcErrorMessageEnum;
 import com.whc.exception.RpcException;
 import com.whc.extensions.ExtensionLoader;
 import com.whc.loadbalance.LoadBalance;
+import com.whc.monitor.Monitor;
+import com.whc.monitor.time.TimeLine;
 import com.whc.registry.ServiceDiscovery;
 import com.whc.registry.zk.util.CuratorUtils;
 import com.whc.remoting.dto.Request;
@@ -27,16 +29,20 @@ public class ZkServiceDiscoveryImpl implements ServiceDiscovery {
     }
 
     @Override
-    public InetSocketAddress lookupService(Request rpcRequest) {
+    public InetSocketAddress lookUpService(Request rpcRequest) {
+        TimeLine timeLine = Monitor.getTimeLine(rpcRequest.getRequestId());
         String rpcServiceName = rpcRequest.getRpcServiceName();
         CuratorFramework zkClient = CuratorUtils.getZkClient();
         List<String> serviceUrlList = CuratorUtils.getChildrenNodes(zkClient, rpcServiceName);
+        timeLine.phaseEndAndNext(TimeLine.Phase.GET_SERVER_LIST);
         if (CollectionUtil.isEmpty(serviceUrlList)) {
             throw new RpcException(RpcErrorMessageEnum.SERVICE_CAN_NOT_BE_FOUND, rpcServiceName);
         }
         // load balancing
         String targetServiceUrl = loadBalance.selectServiceAddress(serviceUrlList, rpcRequest);
+        timeLine.phaseEndAndNext(TimeLine.Phase.LOAD_BALANCE);
         log.info("Successfully found the service address:[{}]", targetServiceUrl);
+
         String[] socketAddressArray = targetServiceUrl.split(":");
         String host = socketAddressArray[0];
         int port = Integer.parseInt(socketAddressArray[1]);

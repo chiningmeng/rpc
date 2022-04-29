@@ -5,7 +5,6 @@ import java.lang.annotation.*;
 
 /**
  * 自动注入服务实现
- *
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

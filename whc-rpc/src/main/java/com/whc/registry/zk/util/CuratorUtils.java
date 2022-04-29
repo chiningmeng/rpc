@@ -36,6 +36,7 @@ public final class CuratorUtils {
 
     /**
      * 创建 pezookeeper 的 persistent nodes
+     *
      * @param zkClient
      * @param path
      */
@@ -56,6 +57,7 @@ public final class CuratorUtils {
 
     /**
      * 取指定节点的子节点
+     *
      * @param zkClient
      * @param rpcServiceName
      * @return
@@ -91,7 +93,7 @@ public final class CuratorUtils {
         });
         log.info("All registered services on the server are cleared:[{}]", REGISTERED_PATH_SET.toString());
     }
-
+//todo rpc.properties
     public static CuratorFramework getZkClient() {
         // 检查是否设置zookeeper 地址
         Properties properties = PropertiesFileUtil.readPropertiesFile(RpcConfigEnum.RPC_CONFIG_PATH.getPropertyValue());
@@ -121,6 +123,7 @@ public final class CuratorUtils {
 
     /**
      * Registers to listen for changes to the specified node
+     *
      * @param rpcServiceName
      * @param zkClient
      * @throws Exception

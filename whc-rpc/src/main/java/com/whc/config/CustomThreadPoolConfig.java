@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 线程池自定义配置类，可自行根据业务场景修改配置参数。
- *
  */
 @Setter
 @Getter

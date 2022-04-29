@@ -7,13 +7,13 @@ import java.util.List;
 
 /**
  * 负载均衡
- *
  */
 @SPI
 public interface LoadBalance {
 
     /**
      * 返回serviceUrlList里的一个服务地址
+     *
      * @param serviceUrlList
      * @param rpcRequest
      * @return

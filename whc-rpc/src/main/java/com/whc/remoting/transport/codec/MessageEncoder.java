@@ -3,8 +3,11 @@ package com.whc.remoting.transport.codec;
 import com.whc.compress.Compress;
 import com.whc.enums.CompressTypeEnum;
 import com.whc.enums.SerializationTypeEnum;
+import com.whc.monitor.Monitor;
+import com.whc.monitor.time.TimeLine;
 import com.whc.remoting.constants.RpcConstants;
 import com.whc.remoting.dto.Message;
+import com.whc.remoting.dto.Request;
 import com.whc.remoting.serialize.Serializer;
 import com.whc.extensions.ExtensionLoader;
 import io.netty.buffer.ByteBuf;
@@ -16,11 +19,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public class MessageEncoder extends MessageToByteEncoder<Message> {
-    private static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger(0);
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Message rpcMessage, ByteBuf out) {
+
         try {
+            TimeLine timeLine = Monitor.getTimeLine(String.valueOf(((Request)rpcMessage.getData()).getRequestId()));
+
             out.writeBytes(RpcConstants.MAGIC_NUMBER);
             out.writeByte(RpcConstants.VERSION);
             // leave a place to write the value of full length
@@ -29,7 +34,6 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
             out.writeByte(messageType);
             out.writeByte(rpcMessage.getCodec());
             out.writeByte(CompressTypeEnum.GZIP.getCode());
-            out.writeInt(ATOMIC_INTEGER.getAndIncrement());
             // build full length
             byte[] bodyBytes = null;
             int fullLength = RpcConstants.HEAD_LENGTH;
@@ -57,6 +61,11 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
             out.writerIndex(writeIndex - fullLength + RpcConstants.MAGIC_NUMBER.length + 1);
             out.writeInt(fullLength);
             out.writerIndex(writeIndex);
+
+            timeLine.phaseEndAndNext(TimeLine.Phase.SERIALIZE);
+            if (rpcMessage.getMessageType() == RpcConstants.RESPONSE_TYPE) {
+                timeLine.setTotalTime(RpcConstants.SUCCESS);
+            }
         } catch (Exception e) {
             log.error("Encode request error!", e);
         }

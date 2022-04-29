@@ -18,12 +18,12 @@ public class Response<T> implements Serializable {
     private String requestId;
 
     /**
-     *  code
+     * code
      */
     private Integer code;
 
     /**
-     *  message
+     * message
      */
     private String message;
 

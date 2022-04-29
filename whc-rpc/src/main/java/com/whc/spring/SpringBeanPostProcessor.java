@@ -29,9 +29,9 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
         this.rpcClient = ExtensionLoader.getExtensionLoader(RequestTransport.class).getExtension("netty");
     }
 
-    @SneakyThrows
+
     @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         if (bean.getClass().isAnnotationPresent(RpcService.class)) {
             log.info("[{}] is annotated with  [{}]", bean.getClass().getName(), RpcService.class.getCanonicalName());
             // get RpcService annotation
@@ -41,13 +41,10 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
                     .group(rpcService.group())
                     .version(rpcService.version())
                     .service(bean).build();
+            //服务注册
             serviceProvider.publishService(rpcServiceConfig);
         }
-        return bean;
-    }
 
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> targetClass = bean.getClass();
         Field[] declaredFields = targetClass.getDeclaredFields();
         for (Field declaredField : declaredFields) {

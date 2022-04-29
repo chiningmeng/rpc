@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ZkServiceProviderImpl implements ServiceProvider {
 
     /**
-     * key: rpc服务名(接口名 + version + group)
+     * key: rpc服务名
      * value: service object
      */
     private final Map<String, Object> serviceMap;

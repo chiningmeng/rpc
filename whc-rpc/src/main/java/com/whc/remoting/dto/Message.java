@@ -21,11 +21,6 @@ public class Message {
     private byte codec;
 
     /**
-     * 请求id
-     */
-    private int requestId;
-
-    /**
      * 压缩类型
      */
     private byte compress;
