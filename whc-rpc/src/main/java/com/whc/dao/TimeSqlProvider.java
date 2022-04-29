@@ -9,7 +9,6 @@ import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 
 public class TimeSqlProvider {
-
     public String countByExample(TimeExample example) {
         SQL sql = new SQL();
         sql.SELECT("count(*)").FROM("rpc_time");

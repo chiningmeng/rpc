@@ -43,7 +43,18 @@
             <artifactId>whc-rpc</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-
+        <!-- 性能测试 -->
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>1.23</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>1.23</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>

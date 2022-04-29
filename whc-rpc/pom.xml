@@ -4,6 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+
     <groupId>com.whc</groupId>
     <artifactId>whc-rpc</artifactId>
     <packaging>jar</packaging>
@@ -17,7 +18,7 @@
         <netty.version>4.1.72.Final</netty.version>
         <kryo.version>4.0.2</kryo.version>
         <curator-version>4.2.0</curator-version>
-        <mybatis-version>2.0.5</mybatis-version>
+        <mybatis-version>2.0.3</mybatis-version>
 
         <!-- test -->
         <junit.jupiter.version>5.5.2</junit.jupiter.version>
@@ -120,27 +121,31 @@
             <version>${mybatis-version}</version>
         </dependency>
 
-        <!-- mybatis-generator -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.5.3</version>
+        </dependency>
+        <!-- MyBatis Generator -->
         <dependency>
             <groupId>org.mybatis.generator</groupId>
             <artifactId>mybatis-generator-core</artifactId>
-            <version>1.3.7</version>
+            <version>1.4.0</version>
         </dependency>
-
+        <!-- MySQL驱动包依赖 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.42</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
+            <!-- Mybatis-Generator插件，自动生成代码 -->
             <plugin>
                 <groupId>org.mybatis.generator</groupId>
                 <artifactId>mybatis-generator-maven-plugin</artifactId>
-                <version>1.3.7</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>mysql</groupId>
-                        <artifactId>mysql-connector-java</artifactId>
-                        <version>5.1.48</version>
-                    </dependency>
-                </dependencies>
+                <version>1.4.0</version>
                 <configuration>
                     <!--指定generatorConfig.xml 配置文件的路径 -->
                     <configurationFile>${basedir}/src/main/resources/generatorConfig.xml</configurationFile>

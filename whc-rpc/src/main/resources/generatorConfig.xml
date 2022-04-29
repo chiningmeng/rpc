@@ -3,6 +3,7 @@
         PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
+    <classPathEntry location="/Users/whc/.m2/repository/mysql/mysql-connector-java/5.1.42/mysql-connector-java-5.1.42.jar"/>
     <context id="test" targetRuntime="MyBatis3">
         <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin"/>
         <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
@@ -16,27 +17,27 @@
         </commentGenerator>
         <!--数据库链接URL，用户名、密码 -->
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://rm-bp1kz6k6fo7n039az7o.mysql.rds.aliyuncs.com:3306/sql_study" userId="root" password="Whc123456">
+                        connectionURL="jdbc:mysql://rm-bp1kz6k6fo7n039az7o.mysql.rds.aliyuncs.com:3306/sql_study" userId="whc" password="Whc123456">
         </jdbcConnection>
         <javaTypeResolver>
             <!-- 浮点精度更高 -->
             <property name="forceBigDecimals" value="false" />
         </javaTypeResolver>
         <!-- 生成模型(entity)的包名和位置 -->
-        <javaModelGenerator targetPackage="com.bz.entity"
+        <javaModelGenerator targetPackage="com.whc.dao.entity"
                             targetProject="src/main/java">
             <property name="enableSubPackages" value="true" />  <!-- enableSubPackages：是否要合并当前两个包    合并之后的包结构是src/main/java/com.bz.entity -->
             <property name="trimStrings" value="true" />        <!-- 是否去除生成实体类中的空格 -->
         </javaModelGenerator>
 
         <!-- 生成映射文件的包名和位置 -->
-        <sqlMapGenerator targetPackage="com.whc.mapper"
+        <sqlMapGenerator targetPackage="mapper"
                          targetProject="src/main/resources">
             <property name="enableSubPackages" value="true" />
         </sqlMapGenerator>
 
         <!-- 生成DAO的包名和位置 -->
-        <javaClientGenerator type="XMLMAPPER"
+        <javaClientGenerator type="ANNOTATEDMAPPER"
                              targetPackage="com.whc.dao" targetProject="src/main/java">    <!--类型就是XMLMAPPER，不用改-->
             <property name="enableSubPackages" value="true" />
         </javaClientGenerator>

@@ -45,7 +45,7 @@ public final class ThreadPoolFactoryUtil {
     }
 
     /**
-     * shutDown 所有线程池
+     * 关闭所有线程池
      */
     public static void shutDownAllThreadPool() {
         log.info("call shutDownAllThreadPool method");
@@ -65,8 +65,7 @@ public final class ThreadPoolFactoryUtil {
     private static ExecutorService createThreadPool(CustomThreadPoolConfig customThreadPoolConfig, String threadNamePrefix, Boolean daemon) {
         ThreadFactory threadFactory = createThreadFactory(threadNamePrefix, daemon);
         return new ThreadPoolExecutor(customThreadPoolConfig.getCorePoolSize(), customThreadPoolConfig.getMaximumPoolSize(),
-                customThreadPoolConfig.getKeepAliveTime(), customThreadPoolConfig.getUnit(), customThreadPoolConfig.getWorkQueue(),
-                threadFactory);
+                customThreadPoolConfig.getKeepAliveTime(), customThreadPoolConfig.getUnit(), customThreadPoolConfig.getWorkQueue(), threadFactory);
     }
 
     /**
@@ -89,20 +88,4 @@ public final class ThreadPoolFactoryUtil {
         return Executors.defaultThreadFactory();
     }
 
-    /**
-     * 打印线程池的状态
-     *
-     * @param threadPool 线程池对象
-     */
-    public static void printThreadPoolStatus(ThreadPoolExecutor threadPool) {
-        ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(1, createThreadFactory("print-thread-pool-status", false));
-        scheduledExecutorService.scheduleAtFixedRate(() -> {
-            log.info("============ThreadPool Status=============");
-            log.info("ThreadPool Size: [{}]", threadPool.getPoolSize());
-            log.info("Active Threads: [{}]", threadPool.getActiveCount());
-            log.info("Number of Tasks : [{}]", threadPool.getCompletedTaskCount());
-            log.info("Number of Tasks in Queue: {}", threadPool.getQueue().size());
-            log.info("===========================================");
-        }, 0, 1, TimeUnit.SECONDS);
-    }
 }
