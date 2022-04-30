@@ -64,7 +64,7 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
 
             timeLine.phaseEndAndNext(TimeLine.Phase.SERIALIZE);
             if (rpcMessage.getMessageType() == RpcConstants.RESPONSE_TYPE) {
-                timeLine.setTotalTime(RpcConstants.SUCCESS);
+                timeLine.setTotalTime();
             }
         } catch (Exception e) {
             log.error("Encode request error!", e);

@@ -6,6 +6,8 @@
 [HashMap线程不安全](https://cloud.tencent.com/developer/article/1797928)
 不能用HashMap存储TimeLine
 
+[mapstruct与lombok](https://stackoverflow.com/questions/63034956/mapstruct-no-property-named-packaging-exists-in-source-parameters)
+
 # SPI机制
 
 SPI 实际上是“基于接口的编程＋策略模式＋配置文件”组合实现的动态加载机制

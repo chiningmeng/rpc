@@ -1,5 +1,6 @@
 package com.whc.config;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,8 +11,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 线程池自定义配置类，可自行根据业务场景修改配置参数。
  */
-@Setter
-@Getter
+@Data
 public class CustomThreadPoolConfig {
     /**
      * 线程池默认参数

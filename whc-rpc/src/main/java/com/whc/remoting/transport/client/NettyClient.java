@@ -111,7 +111,6 @@ public final class NettyClient implements RequestTransport {
                 } else {
                     future.channel().close();
                     resultFuture.completeExceptionally(future.cause());
-                    timeLine.setTotalTime(RpcConstants.Failed);
                     log.error("Send failed:", future.cause());
                 }
             });

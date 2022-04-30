@@ -1,3 +1,5 @@
+import com.whc.monitor.time.ClientTimeLine;
+import com.whc.monitor.time.TimeLine;
 import com.whc.remoting.serialize.Serializer;
 import org.junit.Test;
 
@@ -10,5 +12,10 @@ public class GetTypeTest {
         System.out.println(Serializer.class.getName());
     }
 
+    @Test
+    public void test1() {
+        TimeLine timeLine = new ClientTimeLine();
+        System.out.println(timeLine instanceof ClientTimeLine);
+    }
 
 }

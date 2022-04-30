@@ -81,7 +81,7 @@ public class RpcClientProxy implements InvocationHandler {
             response = completableFuture.get();
 
             timeLine.phaseEndWithTimeStamp(TimeLine.Phase.WAIT_FOR_RESPONSE, phaseStarTimeStamp);
-            timeLine.setTotalTime(RpcConstants.SUCCESS);
+            timeLine.setTotalTime();
         }
         this.check(response, rpcRequest);
         return response.getData();
