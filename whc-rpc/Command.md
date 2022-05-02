@@ -102,6 +102,7 @@ autopurge.purgeInterval=1
 server.1=10.0.16.3:2888:3888
 server.2=10.0.16.17:2888:3888
 server.3=10.0.16.8:2888:3888
+#注意：这里服务器ip因为用的云服务器，所以要用内网ip,外网ip会启动不了
 ~~~
 
 启动zookeeper前要检查jdk是否安装，
