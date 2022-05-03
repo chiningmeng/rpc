@@ -48,7 +48,7 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
                     Message message = (Message) decodeFrame(frame);
 
                     if (message.getMessageType() == RpcConstants.RESPONSE_TYPE) {
-                        TimeLine timeLine = Monitor.getTimeLine(String.valueOf(((Request)message.getData()).getRequestId()));
+                        TimeLine timeLine = Monitor.getTimeLine(String.valueOf(((Response)message.getData()).getRequestId()));
                         timeLine.phaseEndWithTimeStamp(TimeLine.Phase.DESERIALIZE, phaseStarTimeStamp);
                     } else if (message.getMessageType() == RpcConstants.REQUEST_TYPE) {
                         TimeLine timeLine = new ServerTimeLine(String.valueOf(((Request)message.getData()).getRequestId()), WhereEnum.Server);
@@ -73,10 +73,11 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
         checkMagicNumber(in);
         checkVersion(in);
         int fullLength = in.readInt();
-        // 构建Message实例
+        // build RpcMessage object
         byte messageType = in.readByte();
         byte codecType = in.readByte();
         byte compressType = in.readByte();
+        int requestId = in.readInt();
         Message message = Message.builder()
                 .codec(codecType)
                 .messageType(messageType).build();
