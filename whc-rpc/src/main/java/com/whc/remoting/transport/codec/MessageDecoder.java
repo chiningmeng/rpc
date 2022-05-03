@@ -37,31 +37,67 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
 
     @Override
     protected Object decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
-
         long phaseStarTimeStamp = System.currentTimeMillis();
-
         Object decoded = super.decode(ctx, in);
         if (decoded instanceof ByteBuf) {
-            ByteBuf frame = (ByteBuf) decoded;
-            if (frame.readableBytes() >= RpcConstants.TOTAL_LENGTH) {
+            ByteBuf byteBuf = (ByteBuf) decoded;
+            if (byteBuf.readableBytes() >= RpcConstants.TOTAL_LENGTH) {
                 try {
-                    Message message = (Message) decodeFrame(frame);
+                    checkMagicNumber(byteBuf);
+                    checkVersion(byteBuf);
+                    int fullLength = byteBuf.readInt();
+                    // build RpcMessage object
+                    byte messageType = byteBuf.readByte();
+                    byte codecType = byteBuf.readByte();
+                    byte compressType = byteBuf.readByte();
+                    int requestId = byteBuf.readInt();
+                    Message message = Message.builder()
+                            .codec(codecType)
+                            .messageType(messageType).build();
+                    if (messageType == RpcConstants.HEARTBEAT_REQUEST_TYPE) {
+                        message.setData(RpcConstants.PING);
+                        return message;
+                    }
+                    if (messageType == RpcConstants.HEARTBEAT_RESPONSE_TYPE) {
+                        message.setData(RpcConstants.PONG);
+                        return message;
+                    }
+                    int bodyLength = fullLength - RpcConstants.HEAD_LENGTH;
+                    if (bodyLength > 0) {
+                        byte[] bs = new byte[bodyLength];
+                        byteBuf.readBytes(bs);
+                        // decompress the bytes
+                        String compressName = CompressTypeEnum.getName(compressType);
+                        Compress compress = ExtensionLoader.getExtensionLoader(Compress.class)
+                                .getExtension(compressName);
+                        bs = compress.decompress(bs);
+                        // 反序列化
+                        String codecName = SerializationTypeEnum.getName(message.getCodec());
+                        log.info("codec name: [{}] ", codecName);
+                        Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class)
+                                .getExtension(codecName);
+                        if (messageType == RpcConstants.REQUEST_TYPE) {
+                            Request request = serializer.deserialize(bs, Request.class);
+                            message.setData(request);
 
-                    if (message.getMessageType() == RpcConstants.RESPONSE_TYPE) {
-                        TimeLine timeLine = Monitor.getTimeLine(String.valueOf(((Response)message.getData()).getRequestId()));
-                        timeLine.phaseEndWithTimeStamp(TimeLine.Phase.DESERIALIZE, phaseStarTimeStamp);
-                    } else if (message.getMessageType() == RpcConstants.REQUEST_TYPE) {
-                        TimeLine timeLine = new ServerTimeLine(String.valueOf(((Request)message.getData()).getRequestId()), WhereEnum.Server);
-                        timeLine.setStartTimeStamp(phaseStarTimeStamp);
-                        timeLine.phaseEndAndNext(TimeLine.Phase.DESERIALIZE);
-                        Monitor.addTimeLine(timeLine.getTraceId(), timeLine);
+                            TimeLine timeLine = new ServerTimeLine(String.valueOf(request.getRequestId()), WhereEnum.Server);
+                            timeLine.setStartTimeStamp(phaseStarTimeStamp);
+                            timeLine.phaseEndAndNext(TimeLine.Phase.DESERIALIZE);
+                            Monitor.addTimeLine(timeLine.getTraceId(), timeLine);
+                        } else {
+                            Response response = serializer.deserialize(bs, Response.class);
+                            message.setData(response);
+
+                            TimeLine timeLine = Monitor.getTimeLine(String.valueOf(response.getRequestId()));
+                            timeLine.phaseEndWithTimeStamp(TimeLine.Phase.DESERIALIZE, phaseStarTimeStamp);
+                        }
                     }
                     return message;
                 } catch (Exception e) {
-                    log.error("Decode frame error!", e);
+                    log.error("Decode byteBuf error!", e);
                     throw e;
                 } finally {
-                    frame.release();
+                    byteBuf.release();
                 }
             }
         }
@@ -69,52 +105,6 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
     }
 
 
-    private Object decodeFrame(ByteBuf in) {
-        checkMagicNumber(in);
-        checkVersion(in);
-        int fullLength = in.readInt();
-        // build RpcMessage object
-        byte messageType = in.readByte();
-        byte codecType = in.readByte();
-        byte compressType = in.readByte();
-        int requestId = in.readInt();
-        Message message = Message.builder()
-                .codec(codecType)
-                .messageType(messageType).build();
-        if (messageType == RpcConstants.HEARTBEAT_REQUEST_TYPE) {
-            message.setData(RpcConstants.PING);
-            return message;
-        }
-        if (messageType == RpcConstants.HEARTBEAT_RESPONSE_TYPE) {
-            message.setData(RpcConstants.PONG);
-            return message;
-        }
-        int bodyLength = fullLength - RpcConstants.HEAD_LENGTH;
-        if (bodyLength > 0) {
-            byte[] bs = new byte[bodyLength];
-            in.readBytes(bs);
-            // decompress the bytes
-            String compressName = CompressTypeEnum.getName(compressType);
-            Compress compress = ExtensionLoader.getExtensionLoader(Compress.class)
-                    .getExtension(compressName);
-            bs = compress.decompress(bs);
-            // 反序列化
-            String codecName = SerializationTypeEnum.getName(message.getCodec());
-            log.info("codec name: [{}] ", codecName);
-            Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class)
-                    .getExtension(codecName);
-            if (messageType == RpcConstants.REQUEST_TYPE) {
-                Request tmpValue = serializer.deserialize(bs, Request.class);
-                message.setData(tmpValue);
-            } else {
-                Response tmpValue = serializer.deserialize(bs, Response.class);
-                message.setData(tmpValue);
-            }
-        }
-
-        return message;
-
-    }
     //todo 去version
     private void checkVersion(ByteBuf in) {
         // read the version and compare

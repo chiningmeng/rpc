@@ -6,9 +6,28 @@ import lombok.Data;
 
 @Data
 public abstract class TimeLine {
+
     protected String traceId;
+
+    /**
+     * 发生在客户端还是服务端
+     */
     protected WhereEnum where;
+
+    /**
+     * 是否成功
+     */
     protected Boolean isSuccess;
+
+    /**
+     * 请求体大小
+     */
+    protected long requestSize;
+
+    /**
+     * 响应体大小
+     */
+    protected long responseSize;
 
     /**
      * 调用开始时间
