@@ -63,16 +63,18 @@ public class Monitor {
 
     private static TimeMapper getTimeMapperIfAbsent() {
         synchronized (MAPPER_LIST) {
-            String resource = "META-INF/mybatis-config.xml";
-            InputStream inputStream = null;
-            try {
-                inputStream = Resources.getResourceAsStream(resource);
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (MAPPER_LIST.peek() == null) {
+                String resource = "META-INF/mybatis-config.xml";
+                InputStream inputStream = null;
+                try {
+                    inputStream = Resources.getResourceAsStream(resource);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+                TimeMapper timeMapper = sqlSessionFactory.openSession().getMapper(TimeMapper.class);
+                MAPPER_LIST.add(timeMapper);
             }
-            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-            TimeMapper timeMapper = sqlSessionFactory.openSession().getMapper(TimeMapper.class);
-            MAPPER_LIST.add(timeMapper);
         }
         return MAPPER_LIST.peek();
     }

@@ -74,6 +74,11 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
             if (rpcMessage.getMessageType() == RpcConstants.RESPONSE_TYPE) {
                 timeLine.setTotalTime();
             }
+            if (rpcMessage.getData() instanceof Request) {
+                timeLine.setRequestSize(bodyBytes.length);
+            } else if (rpcMessage.getData() instanceof Response) {
+                timeLine.setResponseSize(bodyBytes.length);
+            }
         } catch (Exception e) {
             log.error("Encode request error!", e);
         }

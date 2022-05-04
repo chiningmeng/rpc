@@ -5,12 +5,12 @@
 <mapper namespace="com.whc.dao.TimeMapper">
     <insert id="batchInsertTime">
         INSERT INTO rpc_time (trace_id, where_happen, start_timestamp, end_timestamp, serialize, deserialize,
-                              total, get_connect, load_balance, wait_for_response,get_server_list, handle)
+                              total, get_connect, load_balance, wait_for_response,get_server_list, handle, request_size, response_size)
                               VALUES
         <foreach collection="list" separator="," item="item">
             (#{item.traceId},#{item.whereHappen},#{item.startTimestamp},#{item.endTimestamp},#{item.serialize}
             ,#{item.deserialize},#{item.total},#{item.getConnect},#{item.loadBalance},#{item.waitForResponse}
-            ,#{item.getServerList},#{item.handle})
+            ,#{item.getServerList},#{item.handle}, #{item.requestSize}, #{item.responseSize})
         </foreach>
 
     </insert>
