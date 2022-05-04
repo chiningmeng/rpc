@@ -13,6 +13,7 @@ import com.whc.remoting.dto.Request;
 import com.whc.remoting.dto.Response;
 import com.whc.remoting.transport.RequestTransport;
 import com.whc.remoting.transport.client.NettyClient;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationHandler;
@@ -58,10 +59,10 @@ public class RpcClientProxy implements InvocationHandler {
      * 动态代理类调用其方法时调用
      * The proxy object is the object you get through the getProxy method.
      */
-//    @SneakyThrows
-//    @SuppressWarnings("unchecked")
+    @SneakyThrows
+    @SuppressWarnings("unchecked")
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws ExecutionException, InterruptedException {
+    public Object invoke(Object proxy, Method method, Object[] args) {
         log.info("invoked by method: [{}]", method.getName());
         Request rpcRequest = Request.builder().methodName(method.getName())
                 .parameters(args)
