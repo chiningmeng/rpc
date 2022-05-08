@@ -1,9 +1,10 @@
 package com.whc;
 
 import com.whc.annotation.RpcReference;
+import com.whc.dto.MessageDTO;
+import com.whc.service.HelloWorldService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 @Component
 @Slf4j

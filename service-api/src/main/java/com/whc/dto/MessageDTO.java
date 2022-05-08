@@ -1,4 +1,4 @@
-package com.whc;
+package com.whc.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

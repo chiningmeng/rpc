@@ -18,4 +18,9 @@ public class ClientController {
     public Integer add(@RequestParam Integer a, @RequestParam Integer b) {
         return myService.add(a,b);
     }
+
+    @PostMapping("/bigFile")
+    public Boolean trans(){
+        return myService.transport();
+    }
 }

@@ -25,6 +25,7 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
     @Override
     protected void encode(ChannelHandlerContext ctx, Message rpcMessage, ByteBuf out) {
         try {
+            //无用的初始化，为绕过后面phaseEndAndNext的报错
             TimeLine timeLine = new ClientTimeLine();
             if (rpcMessage.getData() instanceof Request) {
                 timeLine = Monitor.getTimeLine(String.valueOf(((Request)rpcMessage.getData()).getRequestId()));
@@ -71,13 +72,13 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
             out.writerIndex(writeIndex);
 
             timeLine.phaseEndAndNext(TimeLine.Phase.SERIALIZE);
-            if (rpcMessage.getMessageType() == RpcConstants.RESPONSE_TYPE) {
-                timeLine.setTotalTime();
-            }
             if (rpcMessage.getData() instanceof Request) {
                 timeLine.setRequestSize(bodyBytes.length);
             } else if (rpcMessage.getData() instanceof Response) {
                 timeLine.setResponseSize(bodyBytes.length);
+            }
+            if (rpcMessage.getMessageType() == RpcConstants.RESPONSE_TYPE) {
+                timeLine.setTotalTime();
             }
         } catch (Exception e) {
             log.error("Encode request error!", e);

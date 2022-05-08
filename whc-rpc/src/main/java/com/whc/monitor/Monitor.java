@@ -7,8 +7,8 @@ import com.whc.monitor.time.ClientTimeLine;
 import com.whc.monitor.time.ServerTimeLine;
 import com.whc.monitor.time.TimeLine;
 import com.whc.utils.ThreadPoolFactoryUtil;
-import lombok.SneakyThrows;
 import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.springframework.stereotype.Component;
@@ -21,11 +21,11 @@ import java.util.concurrent.ExecutorService;
 
 @Component
 public class Monitor {
-    private static final int TIME_LINE_LIST_SIZE = 3;
+    private static final int TIME_LINE_LIST_SIZE = 500;
     private static final Map<String, TimeLine> TIME_LINE_MAP = new ConcurrentHashMap<>();
     private static final List<Time> finishedTimeLineList = new ArrayList<>(TIME_LINE_LIST_SIZE);
     private static final ExecutorService executorService = ThreadPoolFactoryUtil.createCustomThreadPoolIfAbsent("monitor-thread_pool");
-    private static final Queue<TimeMapper> MAPPER_LIST = new PriorityQueue<>();
+    private static final Queue<SqlSession> SessionQueue = new PriorityQueue<>();
 
     public static void addTimeLine(String requestId, TimeLine timeLine) {
         TIME_LINE_MAP.put(requestId, timeLine);
@@ -37,7 +37,7 @@ public class Monitor {
 
     public static void addFinishedTimeLine(TimeLine timeLine) {
         synchronized (finishedTimeLineList) {
-            if (finishedTimeLineList.size() < TIME_LINE_LIST_SIZE-1) {
+            if (finishedTimeLineList.size() <= TIME_LINE_LIST_SIZE-1) {
                 if (timeLine instanceof ClientTimeLine) {
                     Time time = TimeLineConverter.INSTANCE.clientToTimePO((ClientTimeLine) timeLine);
                     finishedTimeLineList.add(time);
@@ -49,11 +49,14 @@ public class Monitor {
                 executorService.execute(new Runnable() {
                     @Override
                     public void run() {
-                        TimeMapper timeMapper = MAPPER_LIST.peek();
-                        if (timeMapper == null) {
-                            timeMapper = getTimeMapperIfAbsent();
+                        SqlSession sqlSession =SessionQueue.peek();
+                        TimeMapper timeMapper;
+                        if (sqlSession == null) {
+                            sqlSession = getTimeMapperIfAbsent();
                         }
+                        timeMapper = sqlSession.getMapper(TimeMapper.class);
                         timeMapper.batchInsertTime(finishedTimeLineList);
+                        sqlSession.commit();
                         finishedTimeLineList.clear();
                     }
                 });
@@ -61,9 +64,9 @@ public class Monitor {
         }
     }
 
-    private static TimeMapper getTimeMapperIfAbsent() {
-        synchronized (MAPPER_LIST) {
-            if (MAPPER_LIST.peek() == null) {
+    private static SqlSession getTimeMapperIfAbsent() {
+        synchronized (SessionQueue) {
+            if (SessionQueue.peek() == null) {
                 String resource = "META-INF/mybatis-config.xml";
                 InputStream inputStream = null;
                 try {
@@ -72,11 +75,10 @@ public class Monitor {
                     e.printStackTrace();
                 }
                 SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-                TimeMapper timeMapper = sqlSessionFactory.openSession().getMapper(TimeMapper.class);
-                MAPPER_LIST.add(timeMapper);
+                SessionQueue.add(sqlSessionFactory.openSession());
             }
         }
-        return MAPPER_LIST.peek();
+        return SessionQueue.peek();
     }
 
 }

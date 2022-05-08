@@ -26,9 +26,6 @@ public class ServerTimeLine extends TimeLine {
                 this.serializeTime = consumeTime;
                 break;
         }
-        if (Phase.SERIALIZE == phase) {
-           setEndTimeStamp(phaseEndTimeStamp);
-        }
     }
 
 }

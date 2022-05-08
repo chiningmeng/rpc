@@ -1,6 +1,15 @@
 
-## 安装mysql
+# mysql
 https://blog.51cto.com/u_15187242/2744720
+~~~shell
+#搜索mysql镜像
+docker search mysql
+#拉取镜像
+docker pull mysql:5.7
+
+docker run -dp 3306:3306 --name mysql -v /mydocker/mysql/conf:/etc/mysql/conf.d -v /mydocker/mysql/logs:/var/log/mysql -v /mydocker/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=Whc194910 -d mysql:5.7 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+~~~
 
 # Docker
 
@@ -112,3 +121,28 @@ server.3=10.0.16.8:2888:3888
 启动zookeeper前要检查jdk是否安装，
 [下载jdk](https://blog.csdn.net/qq_44543508/article/details/108864424)
 [解决找不到javac命令](https://blog.csdn.net/qq_42720183/article/details/117439447)
+
+# 向服务器上传文件
+https://cloud.tencent.com/document/product/213/2133
+~~~shell
+#client
+scp root@129.226.32.128:/home/lighthouse/client-0.0.1-SNAPSHOT.jar /Users/whc/IdeaProjects/rpc/client/target/client-0.0.1-SNAPSHOT.jar
+scp root@43.152.215.172:/home/lighthouse/client-0.0.1-SNAPSHOT.jar /Users/whc/IdeaProjects/rpc/client/target/client-0.0.1-SNAPSHOT.jar
+scp root@43.152.215.173:/home/lighthouse/client-0.0.1-SNAPSHOT.jar /Users/whc/IdeaProjects/rpc/client/target/client-0.0.1-SNAPSHOT.jar
+scp root@43.152.215.17:/home/lighthouse/client-0.0.1-SNAPSHOT.jar /Users/whc/IdeaProjects/rpc/client/target/client-0.0.1-SNAPSHOT.jar
+
+#server
+scp root@43.152.212.117:/home/lighthouse/service-example-1.0-SNAPSHOT.jar /Users/whc/IdeaProjects/rpc/service-example/target/service-example-1.0-SNAPSHOT.jar
+scp root@43.152.215.115:/home/lighthouse/service-example-1.0-SNAPSHOT.jar /Users/whc/IdeaProjects/rpc/service-example/target/service-example-1.0-SNAPSHOT.jar
+scp root@43.152.214.5:/home/lighthouse/service-example-1.0-SNAPSHOT.jar /Users/whc/IdeaProjects/rpc/service-example/target/service-example-1.0-SNAPSHOT.jar
+scp root@43.152.214.162:/home/lighthouse/service-example-1.0-SNAPSHOT.jar /Users/whc/IdeaProjects/rpc/service-example/target/service-example-1.0-SNAPSHOT.jar
+~~~
+
+#启动jar
+~~~shell
+#client
+nohup java -jar client-0.0.1-SNAPSHOT.jar >log.out &
+
+#server
+nohup java -jar service-example-1.0-SNAPSHOT.jar >log.out &
+~~~

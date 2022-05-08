@@ -1,8 +1,8 @@
-package com.whc.serviceImpl;
+package com.whc.server.serviceImpl;
 
-import com.whc.service.HelloWorldService;
-import com.whc.dto.MessageDTO;
 import com.whc.annotation.RpcService;
+import com.whc.dto.MessageDTO;
+import com.whc.service.HelloWorldService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

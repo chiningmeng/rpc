@@ -11,9 +11,9 @@
             <transactionManager type="JDBC"/>
             <dataSource type="POOLED">
                 <property name="driver" value="com.mysql.jdbc.Driver"/>
-                <property name="url" value="jdbc:82.157.50.170:3306/rpc"/>
-                <property name="username" value="whc"/>
-                <property name="password" value="Whc123456"/>
+                <property name="url" value="jdbc:mysql://43.152.214.179:3306/rpc"/>
+                <property name="username" value="root"/>
+                <property name="password" value="Whc194910"/>
             </dataSource>
         </environment>
     </environments>

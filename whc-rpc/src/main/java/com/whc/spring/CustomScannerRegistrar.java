@@ -17,6 +17,9 @@ public class CustomScannerRegistrar implements ImportBeanDefinitionRegistrar {
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
 
+        /**
+         * 会默认扫描Component等Spring原生注解
+         */
         // 扫描RpcService注解
         CustomScanner rpcServiceScanner = new CustomScanner(beanDefinitionRegistry, RpcService.class);
         rpcServiceScanner.scan(THIS_PACKAGE);
