@@ -7,12 +7,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-@SpringBootApplication
 @RpcScan
+@SpringBootApplication
 public class ServerApplication {
 
 
     public static void main(String[] args) {
+
         SpringApplication.run(ServerApplication.class, args);
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(ServerApplication.class);
         NettyServer nettyServer = (NettyServer) applicationContext.getBean("nettyServer");

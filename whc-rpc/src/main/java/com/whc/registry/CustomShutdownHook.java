@@ -1,6 +1,6 @@
-package com.whc.config;
+package com.whc.registry;
 
-import com.whc.registry.zk.util.CuratorUtils;
+import com.whc.utils.CuratorUtils;
 import com.whc.remoting.transport.server.NettyServer;
 import com.whc.utils.ThreadPoolFactoryUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +21,10 @@ public class CustomShutdownHook {
     }
 
     public void clearAll() {
-        log.info("addShutdownHook for clearAll");
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.info("开始清除发布的服务");
             try {
+                log.info("清除发布的服务：[{}]", InetAddress.getLocalHost().getHostAddress());
                 InetSocketAddress inetSocketAddress = new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(), NettyServer.PORT);
                 CuratorUtils.clearRegistry(CuratorUtils.getZkClient(), inetSocketAddress);
             } catch (UnknownHostException ignored) {

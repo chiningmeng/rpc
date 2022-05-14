@@ -4,8 +4,11 @@ import com.whc.annotation.RpcService;
 import com.whc.dto.MessageDTO;
 import com.whc.service.HelloWorldService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 @Slf4j
+@Component
 @RpcService(group = "test1", version = "version1")
 public class HelloWorldServiceImpl implements HelloWorldService {
 

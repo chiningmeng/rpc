@@ -1,8 +1,7 @@
 package com.whc.registry.zk;
 
 import com.whc.registry.ServiceRegistry;
-import com.whc.registry.zk.util.CuratorUtils;
-import lombok.extern.slf4j.Slf4j;
+import com.whc.utils.CuratorUtils;
 import org.apache.curator.framework.CuratorFramework;
 
 import java.net.InetSocketAddress;

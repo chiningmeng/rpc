@@ -104,8 +104,6 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
         return decoded;
     }
 
-
-    //todo 去version
     private void checkVersion(ByteBuf in) {
         // read the version and compare
         byte version = in.readByte();

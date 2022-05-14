@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * store and get Channel object
+ * 存储Channel
  */
 @Slf4j
 public class ChannelProvider {

@@ -115,6 +115,7 @@ public final class NettyClient implements RequestTransport {
                 }
             });
         } else {
+            //todo 注销
             throw new IllegalStateException();
         }
 

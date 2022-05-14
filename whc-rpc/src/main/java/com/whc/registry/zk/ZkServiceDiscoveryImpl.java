@@ -8,7 +8,7 @@ import com.whc.loadbalance.LoadBalance;
 import com.whc.monitor.Monitor;
 import com.whc.monitor.time.TimeLine;
 import com.whc.registry.ServiceDiscovery;
-import com.whc.registry.zk.util.CuratorUtils;
+import com.whc.utils.CuratorUtils;
 import com.whc.remoting.dto.Request;
 import com.whc.utils.CollectionUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -38,10 +38,10 @@ public class ZkServiceDiscoveryImpl implements ServiceDiscovery {
         if (CollectionUtil.isEmpty(serviceUrlList)) {
             throw new RpcException(RpcErrorMessageEnum.SERVICE_CAN_NOT_BE_FOUND, rpcServiceName);
         }
-        // load balancing
+        // 负载均衡
         String targetServiceUrl = loadBalance.selectServiceAddress(serviceUrlList, rpcRequest);
         timeLine.phaseEndAndNext(TimeLine.Phase.LOAD_BALANCE);
-        log.info("Successfully found the service address:[{}]", targetServiceUrl);
+        log.info("发现服务ip地址 :[{}]", targetServiceUrl);
 
         String[] socketAddressArray = targetServiceUrl.split(":");
         String host = socketAddressArray[0];

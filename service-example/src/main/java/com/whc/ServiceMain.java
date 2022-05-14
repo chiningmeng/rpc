@@ -11,6 +11,7 @@ public class ServiceMain {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(ServiceMain.class);
         NettyServer nettyServer = (NettyServer) applicationContext.getBean("nettyServer");
         nettyServer.start();
+//        new NettyServer().start();
     }
 }
 

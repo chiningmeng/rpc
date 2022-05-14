@@ -1,4 +1,4 @@
-package com.whc.registry.zk.util;
+package com.whc.utils;
 
 import com.whc.enums.RpcConfigEnum;
 import com.whc.utils.PropertiesFileUtil;
@@ -92,7 +92,7 @@ public final class CuratorUtils {
         });
         log.info("All registered services on the server are cleared:[{}]", REGISTERED_PATH_SET.toString());
     }
-//todo rpc.properties
+
     public static CuratorFramework getZkClient() {
         // 检查是否设置zookeeper 地址
         Properties properties = PropertiesFileUtil.readPropertiesFile(RpcConfigEnum.RPC_CONFIG_PATH.getPropertyValue());
@@ -112,7 +112,7 @@ public final class CuratorUtils {
         try {
             // 等待30s 直到连接成功
             if (!zkClient.blockUntilConnected(30, TimeUnit.SECONDS)) {
-                throw new RuntimeException("Time out waiting to connect to ZK!");
+                throw new RuntimeException("连接ZK超时!");
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -121,7 +121,7 @@ public final class CuratorUtils {
     }
 
     /**
-     * Registers to listen for changes to the specified node
+     * 监听特定节点变动
      *
      * @param rpcServiceName
      * @param zkClient

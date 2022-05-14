@@ -9,6 +9,7 @@ import com.whc.provider.ServiceProvider;
 import com.whc.provider.impl.ZkServiceProviderImpl;
 import com.whc.proxy.RpcClientProxy;
 import com.whc.remoting.transport.RequestTransport;
+import com.whc.remoting.transport.server.NettyServer;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -28,23 +29,8 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
         this.serviceProvider = SingletonFactory.getInstance(ZkServiceProviderImpl.class);
         this.rpcClient = ExtensionLoader.getExtensionLoader(RequestTransport.class).getExtension("netty");
     }
-
-
     @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        if (bean.getClass().isAnnotationPresent(RpcService.class)) {
-            log.info("[{}] is annotated with  [{}]", bean.getClass().getName(), RpcService.class.getCanonicalName());
-            // get RpcService annotation
-            RpcService rpcService = bean.getClass().getAnnotation(RpcService.class);
-            // build RpcServiceProperties
-            RpcServiceConfig rpcServiceConfig = RpcServiceConfig.builder()
-                    .group(rpcService.group())
-                    .version(rpcService.version())
-                    .service(bean).build();
-            //服务注册
-            serviceProvider.publishService(rpcServiceConfig);
-        }
-
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         Class<?> targetClass = bean.getClass();
         Field[] declaredFields = targetClass.getDeclaredFields();
         for (Field declaredField : declaredFields) {
@@ -64,6 +50,24 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
                     e.printStackTrace();
                 }
             }
+        }
+
+        return bean;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        if (bean.getClass().isAnnotationPresent(RpcService.class)) {
+            log.info("[{}] is annotated with  [{}]", bean.getClass().getName(), RpcService.class.getCanonicalName());
+            // get RpcService annotation
+            RpcService rpcService = bean.getClass().getAnnotation(RpcService.class);
+            // build RpcServiceProperties
+            RpcServiceConfig rpcServiceConfig = RpcServiceConfig.builder()
+                    .group(rpcService.group())
+                    .version(rpcService.version())
+                    .service(bean).build();
+            //服务注册
+            serviceProvider.publishService(rpcServiceConfig);
         }
         return bean;
     }

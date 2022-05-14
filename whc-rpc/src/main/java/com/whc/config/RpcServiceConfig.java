@@ -8,16 +8,16 @@ import lombok.*;
 @Builder
 public class RpcServiceConfig {
     /**
-     * service version
+     * 服务版本
      */
     private String version = "";
     /**
-     * when the interface has multiple implementation classes, distinguish by group
+     * 服务分组
      */
     private String group = "";
 
     /**
-     * target service
+     * 服务对象实例
      */
     private Object service;
 
@@ -25,7 +25,4 @@ public class RpcServiceConfig {
         return this.service.getClass().getInterfaces()[0].getCanonicalName();
     }
 
-//    public String getServiceName() {
-//        return this.service.getClass().getInterfaces()[0].getCanonicalName();
-//    }
 }

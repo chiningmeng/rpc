@@ -1,6 +1,6 @@
 package com.whc.remoting.transport.server;
 
-import com.whc.config.CustomShutdownHook;
+import com.whc.registry.CustomShutdownHook;
 import com.whc.config.RpcServiceConfig;
 import com.whc.factory.SingletonFactory;
 import com.whc.provider.ServiceProvider;
@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class NettyServer {
     public static final int PORT = 9998;
-
     private final ServiceProvider serviceProvider = SingletonFactory.getInstance(ZkServiceProviderImpl.class);
 
     public void registerService(RpcServiceConfig rpcServiceConfig) {
@@ -77,7 +76,6 @@ public class NettyServer {
         } catch (InterruptedException e) {
             log.error("occur exception when start server:", e);
         } finally {
-            log.error("shutdown bossGroup and workerGroup");
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
             serviceHandlerGroup.shutdownGracefully();

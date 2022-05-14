@@ -18,6 +18,8 @@ public class Request implements Serializable {
     private String methodName;
     private Object[] parameters;
     private Class<?>[] paramTypes;
+    private String version;
+    private String group;
 
     public String getRpcServiceName() {
         return this.getServiceClassName();

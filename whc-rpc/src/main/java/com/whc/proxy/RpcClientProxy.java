@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * 动态代理类
  * 如果调用一个method，实际调用的是invoke
- * "隐藏"了客户端与服务端间通信的细节
+ * 隐藏客户端与服务端间通信的细节
  */
 @Slf4j
 public class RpcClientProxy implements InvocationHandler {
@@ -69,6 +69,8 @@ public class RpcClientProxy implements InvocationHandler {
                 .serviceClassName(method.getDeclaringClass().getName())
                 .paramTypes(method.getParameterTypes())
                 .requestId(UUID.randomUUID().toString())
+                .group(serviceConfig.getGroup())
+                .version(serviceConfig.getVersion())
                 .build();
         Response<Object> response = null;
 
