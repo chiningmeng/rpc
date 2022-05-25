@@ -21,18 +21,18 @@ import java.util.concurrent.ExecutorService;
 
 @Component
 public class Monitor {
-    private static final int TIME_LINE_LIST_SIZE = 500;
-    private static final Map<String, TimeLine> TIME_LINE_MAP = new ConcurrentHashMap<>();
+    private static final int TIME_LINE_LIST_SIZE = 5000;
+    private static final Map<String, TimeLine> timeLineMap = new ConcurrentHashMap<>();
     private static final List<Time> finishedTimeLineList = new ArrayList<>(TIME_LINE_LIST_SIZE);
     private static final ExecutorService executorService = ThreadPoolFactoryUtil.createCustomThreadPoolIfAbsent("monitor-thread_pool");
     private static final Queue<SqlSession> SessionQueue = new PriorityQueue<>();
 
     public static void addTimeLine(String requestId, TimeLine timeLine) {
-        TIME_LINE_MAP.put(requestId, timeLine);
+        timeLineMap.put(requestId, timeLine);
     }
 
     public static TimeLine getTimeLine(String requestId) {
-        return TIME_LINE_MAP.get(requestId);
+        return timeLineMap.get(requestId);
     }
 
     public static void addFinishedTimeLine(TimeLine timeLine) {
@@ -49,7 +49,7 @@ public class Monitor {
                 executorService.execute(new Runnable() {
                     @Override
                     public void run() {
-                        SqlSession sqlSession =SessionQueue.peek();
+                        SqlSession sqlSession = SessionQueue.peek();
                         TimeMapper timeMapper;
                         if (sqlSession == null) {
                             sqlSession = getTimeMapperIfAbsent();

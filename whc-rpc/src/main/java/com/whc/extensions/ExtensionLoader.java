@@ -42,13 +42,13 @@ public final class ExtensionLoader<T> {
      */
     public static <S> ExtensionLoader<S> getExtensionLoader(Class<S> type) {
         if (type == null) {
-            throw new IllegalArgumentException("Extension type should not be null.");
+            throw new IllegalArgumentException("扩展不能为空");
         }
         if (!type.isInterface()) {
-            throw new IllegalArgumentException("Extension type must be an interface.");
+            throw new IllegalArgumentException("扩展必须为接口");
         }
         if (type.getAnnotation(SPI.class) == null) {
-            throw new IllegalArgumentException("Extension type must be annotated by @SPI");
+            throw new IllegalArgumentException("该扩展没有标注@SPI");
         }
         // 先从内存中取，若无则新建一个
         ExtensionLoader<S> extensionLoader = (ExtensionLoader<S>) EXTENSION_LOADER_MAP.get(type);
@@ -67,7 +67,7 @@ public final class ExtensionLoader<T> {
      */
     public T getExtension(String name) {
         if (StringUtil.isBlank(name)) {
-            throw new IllegalArgumentException("Extension name should not be null or empty.");
+            throw new IllegalArgumentException("扩展名不能为空");
         }
         // 先去缓存中找，若没有则创建一个
         Holder<Object> holder = cachedInstanceMap.get(name);
@@ -98,7 +98,7 @@ public final class ExtensionLoader<T> {
     private T createExtension(String name) {
         Class<?> clazz = getExtensionClassMap().get(name);
         if (Objects.isNull(clazz)) {
-            throw new RuntimeException("No such extension of the name " + name);
+            throw new RuntimeException("没有名为 " + name + " 的扩展");
         }
         T instance = (T) EXTENSION_INSTANCE_MAP.get(clazz);
         if (Objects.isNull(instance)) {
@@ -120,7 +120,6 @@ public final class ExtensionLoader<T> {
     private Map<String, Class<?>> getExtensionClassMap() {
         // 从内存中取加载过的扩展类
         Map<String, Class<?>> stringClassMap = cachedClassHolder.get();
-        // 非空校验
         if (Objects.isNull(stringClassMap)) {
             synchronized (cachedClassHolder) {
                 stringClassMap = cachedClassHolder.get();

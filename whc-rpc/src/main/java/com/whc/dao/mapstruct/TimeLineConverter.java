@@ -20,6 +20,7 @@ public interface TimeLineConverter {
     @Mapping(source = "loadBalanceTime", target = "loadBalance")
     @Mapping(source = "waitForResponseTime", target = "waitForResponse")
     @Mapping(source = "getServerListTime", target = "getServerList")
+    @Mapping(source = "ipAddress", target = "ipAddress")
     Time clientToTimePO(ClientTimeLine timeLine);
 
     @Mapping(source = "where.name", target = "whereHappen")

@@ -21,10 +21,9 @@ public class ChannelProvider {
 
     public Channel get(InetSocketAddress inetSocketAddress) {
         String key = inetSocketAddress.toString();
-        // determine if there is a connection for the corresponding address
+        // 查找是否有已创建的连接
         if (channelMap.containsKey(key)) {
             Channel channel = channelMap.get(key);
-            // if so, determine if the connection is available, and if so, get it directly
             if (channel != null && channel.isActive()) {
                 return channel;
             } else {
@@ -42,6 +41,6 @@ public class ChannelProvider {
     public void remove(InetSocketAddress inetSocketAddress) {
         String key = inetSocketAddress.toString();
         channelMap.remove(key);
-        log.info("Channel map size :[{}]", channelMap.size());
+        log.info("channelMap size :[{}]", channelMap.size());
     }
 }

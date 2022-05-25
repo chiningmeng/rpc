@@ -59,6 +59,11 @@ public abstract class TimeLine {
      */
     protected long totalTime;
 
+    /**
+     * 负载均衡后选择的地址
+     */
+    private String ipAddress;
+
     public TimeLine() {
     }
 

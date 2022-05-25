@@ -7,14 +7,16 @@ import com.whc.extensions.ExtensionLoader;
 import com.whc.provider.ServiceProvider;
 import com.whc.registry.ServiceRegistry;
 import com.whc.remoting.transport.server.NettyServer;
+import com.whc.utils.IpAddressUtils;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
+import java.net.*;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.whc.utils.IpAddressUtils.getIpAddress;
 
 
 @Slf4j
@@ -56,13 +58,9 @@ public class ZkServiceProviderImpl implements ServiceProvider {
 
     @Override
     public void publishService(RpcServiceConfig rpcServiceConfig) {
-        try {
-            String host = InetAddress.getLocalHost().getHostAddress();
-            this.addService(rpcServiceConfig);
-            serviceRegistry.registerService(rpcServiceConfig.getRpcServiceName(), new InetSocketAddress(host, NettyServer.PORT));
-        } catch (UnknownHostException e) {
-            log.error("getHostAddress failed", e);
-        }
+        String host = IpAddressUtils.getIpAddress();
+        this.addService(rpcServiceConfig);
+        serviceRegistry.registerService(rpcServiceConfig.getRpcServiceName(), new InetSocketAddress(host, NettyServer.PORT));
     }
 
 }

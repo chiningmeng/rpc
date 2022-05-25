@@ -20,15 +20,6 @@ public class BigFileTransportServiceImpl implements BigFileTransportService {
     @SneakyThrows
     @Override
     public BigFileDTO transport(BigFileDTO bigFileDTO) {
-        File path = new File(ResourceUtils.getURL("classpath:").getPath());
-        String fileName = path.getAbsolutePath() + "/static/BigFile-2kb.txt";
-        String content = new String(Files.readAllBytes(Paths.get(fileName)));
-        log.info("content: [{}]",content);
-        String requestContent = bigFileDTO.getBigFile();
-        log.info("requestContent: [{}]",requestContent);
-        if (content.equals(requestContent)) {
-            return new BigFileDTO(content);
-        }
-        return new BigFileDTO("");
+        return new BigFileDTO(bigFileDTO.getBigFile());
     }
 }

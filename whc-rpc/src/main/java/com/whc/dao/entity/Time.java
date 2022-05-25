@@ -37,4 +37,6 @@ public class Time implements Serializable {
     private Long requestSize;
 
     private Long responseSize;
+
+    private String ipAddress;
 }

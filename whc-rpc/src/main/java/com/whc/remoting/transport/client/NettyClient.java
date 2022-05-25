@@ -38,21 +38,17 @@ public final class NettyClient implements RequestTransport {
     private final EventLoopGroup eventLoopGroup;
 
     public NettyClient() {
-        // initialize resources such as EventLoopGroup, Bootstrap
         eventLoopGroup = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
         bootstrap.group(eventLoopGroup)
                 .channel(NioSocketChannel.class)
                 .handler(new LoggingHandler(LogLevel.INFO))
-                //  The timeout period of the connection.
-                //  If this time is exceeded or the connection cannot be established, the connection fails.
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-                .handler(new ChannelInitializer<SocketChannel>() {
+                .handler(new ChannelInitializer<NioSocketChannel>() {
                     @Override
-                    protected void initChannel(SocketChannel ch) {
+                    protected void initChannel(NioSocketChannel ch) {
                         ChannelPipeline p = ch.pipeline();
-                        // If no data is sent to the server within 15 seconds, a heartbeat request is sent
-                        p.addLast(new IdleStateHandler(0, 5, 0, TimeUnit.SECONDS));
+                        p.addLast(new IdleStateHandler(15, 15, 0, TimeUnit.SECONDS));
                         p.addLast(new MessageEncoder());
                         p.addLast(new MessageDecoder());
                         p.addLast(new ClientHandler());
@@ -64,19 +60,21 @@ public final class NettyClient implements RequestTransport {
     }
 
     /**
-     * connect server and get the channel ,so that you can send rpc message to server
+     * 连接服务端
      *
      * @param inetSocketAddress server address
      * @return the channel
      */
     @SneakyThrows
     public Channel doConnect(InetSocketAddress inetSocketAddress) {
+        log.info("连接服务端，其IP地址：{}",inetSocketAddress.toString());
         CompletableFuture<Channel> completableFuture = new CompletableFuture<>();
         bootstrap.connect(inetSocketAddress).addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
-                log.info("The client has connected [{}] successful!", inetSocketAddress.toString());
+                log.info("与服务端[{}]连接成功 ", inetSocketAddress.toString());
                 completableFuture.complete(future.channel());
             } else {
+                log.error("连接服务端[{}]失败", inetSocketAddress.toString());
                 throw new IllegalStateException();
             }
         });
@@ -94,10 +92,10 @@ public final class NettyClient implements RequestTransport {
         InetSocketAddress inetSocketAddress = serviceDiscovery.lookUpService(rpcRequest);
         // 获取ip所对应的Channel
         Channel channel = getChannel(inetSocketAddress);
+        timeLine.setIpAddress(inetSocketAddress.getHostName());
         timeLine.phaseEndAndNext(TimeLine.Phase.GET_CONNECT);
 
         if (channel.isActive()) {
-            // put unprocessed request
             unprocessedRequests.put(rpcRequest.getRequestId(), resultFuture);
             Message rpcMessage = Message.builder().data(rpcRequest)
                     .codec(SerializationTypeEnum.HESSIAN.getCode())
@@ -105,18 +103,15 @@ public final class NettyClient implements RequestTransport {
                     .messageType(RpcConstants.REQUEST_TYPE).build();
             channel.writeAndFlush(rpcMessage).addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
-                    //todo writeAndFlush 成功并不代表对端接受到了请求，返回值为 true 只能保证写入网络缓冲区成功，并不代表发送成功
-
-                    log.info("client send message: [{}]", rpcMessage);
+                    log.info("客户端发送请求： [{}]", rpcMessage);
                 } else {
                     future.channel().close();
                     resultFuture.completeExceptionally(future.cause());
-                    log.error("Send failed:", future.cause());
+                    log.error("发送失败:", future.cause());
                 }
             });
         } else {
-            //todo 注销
-            throw new IllegalStateException();
+            log.error("连接失效");
         }
 
         return resultFuture;
@@ -131,7 +126,4 @@ public final class NettyClient implements RequestTransport {
         return channel;
     }
 
-    public void close() {
-        eventLoopGroup.shutdownGracefully();
-    }
 }

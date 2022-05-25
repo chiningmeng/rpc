@@ -1,9 +1,12 @@
 package com.whc.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -15,18 +18,24 @@ public final class PropertiesFileUtil {
     }
 
     public static Properties readPropertiesFile(String fileName) {
-        URL url = Thread.currentThread().getContextClassLoader().getResource("");
-        String rpcConfigPath = "";
-        if (url != null) {
-            rpcConfigPath = url.getPath() + fileName;
+        URL resource = PropertiesFileUtil.class.getClassLoader().getResource(fileName);
+        if (resource == null) {
+            log.error("无法读文件 [{}]", fileName);
+        }
+        String path = resource.toString();
+        System.out.println(path);
+        InputStream is = null;
+        try {
+            is = resource.openStream();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         Properties properties = null;
-        try (InputStreamReader inputStreamReader = new InputStreamReader(
-                new FileInputStream(rpcConfigPath), StandardCharsets.UTF_8)) {
+        try (InputStreamReader inputStreamReader = new InputStreamReader(is)) {
             properties = new Properties();
             properties.load(inputStreamReader);
         } catch (IOException e) {
-            log.error("occur exception when read properties file [{}]", fileName);
+            log.error("无法读文件 [{}]", fileName);
         }
         return properties;
     }

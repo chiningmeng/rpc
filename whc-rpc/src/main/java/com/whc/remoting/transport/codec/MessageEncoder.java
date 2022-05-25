@@ -36,26 +36,26 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
 
             out.writeBytes(RpcConstants.MAGIC_NUMBER);
             out.writeByte(RpcConstants.VERSION);
-            // leave a place to write the value of full length
+            // 给全长留白
             out.writerIndex(out.writerIndex() + 4);
             byte messageType = rpcMessage.getMessageType();
             out.writeByte(messageType);
             out.writeByte(rpcMessage.getCodec());
             out.writeByte(CompressTypeEnum.GZIP.getCode());
             out.writeInt(ATOMIC_INTEGER.getAndIncrement());
-            // build full length
+            // 构建全长
             byte[] bodyBytes = null;
             int fullLength = RpcConstants.HEAD_LENGTH;
-            // if messageType is not heartbeat message,fullLength = head length + body length
+            // 全长 = 报文头长度 + 消息体长度
             if (messageType != RpcConstants.HEARTBEAT_REQUEST_TYPE
                     && messageType != RpcConstants.HEARTBEAT_RESPONSE_TYPE) {
-                // serialize the object
+                // 序列化
                 String codecName = SerializationTypeEnum.getName(rpcMessage.getCodec());
                 log.info("codec name: [{}] ", codecName);
                 Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class)
                         .getExtension(codecName);
                 bodyBytes = serializer.serialize(rpcMessage.getData());
-                // compress the bytes
+                // 压缩
                 String compressName = CompressTypeEnum.getName(rpcMessage.getCompress());
                 Compress compress = ExtensionLoader.getExtensionLoader(Compress.class)
                         .getExtension(compressName);
@@ -81,7 +81,7 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
                 timeLine.setTotalTime();
             }
         } catch (Exception e) {
-            log.error("Encode request error!", e);
+            log.error("编码错误!", e);
         }
 
     }

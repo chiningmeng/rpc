@@ -6,6 +6,7 @@ import com.whc.enums.SerializationTypeEnum;
 import com.whc.factory.SingletonFactory;
 import com.whc.monitor.Monitor;
 import com.whc.monitor.time.TimeLine;
+import com.whc.invoke.ServerInvoker;
 import com.whc.remoting.constants.RpcConstants;
 import com.whc.remoting.dto.Message;
 import com.whc.remoting.dto.Request;
@@ -20,20 +21,18 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ServerHandler extends SimpleChannelInboundHandler {
-    private final RpcRequestHandler rpcRequestHandler;
+    private final ServerInvoker serverInvoker;
 
     public ServerHandler() {
-        this.rpcRequestHandler = SingletonFactory.getInstance(RpcRequestHandler.class);
+        this.serverInvoker = SingletonFactory.getInstance(ServerInvoker.class);
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object requestMessage) throws Exception {
         try {
             if (requestMessage instanceof Message) {
-                log.info("server receive msg: [{}] ", requestMessage);
                 byte messageType = ((Message) requestMessage).getMessageType();
                 Message responseMessage = new Message();
-                //todo HESSIAN
                 responseMessage.setCodec(SerializationTypeEnum.HESSIAN.getCode());
                 responseMessage.setCompress(CompressTypeEnum.GZIP.getCode());
                 if (messageType == RpcConstants.HEARTBEAT_REQUEST_TYPE) {
@@ -45,17 +44,15 @@ public class ServerHandler extends SimpleChannelInboundHandler {
                     TimeLine timeLine = Monitor.getTimeLine(rpcRequest.getRequestId());
                     timeLine.phaseStartWithTimeStamp(System.currentTimeMillis());
                     // 执行服务端对应方法
-                    Object result = rpcRequestHandler.handle(rpcRequest);
+                    Response<Object> rpcResponse = serverInvoker.handle(rpcRequest);
                     timeLine.phaseEndAndNext(TimeLine.Phase.HANDLE);
-                    log.info(String.format("server get result: %s", result.toString()));
                     responseMessage.setMessageType(RpcConstants.RESPONSE_TYPE);
                     if (ctx.channel().isActive() && ctx.channel().isWritable()) {
-                        Response<Object> rpcResponse = Response.success(result, rpcRequest.getRequestId());
                         responseMessage.setData(rpcResponse);
                     } else {
-                        Response<Object> rpcResponse = Response.fail(ResponseCodeEnum.FAIL);
-                        responseMessage.setData(rpcResponse);
-                        log.error("not writable now, message dropped");
+                        Response<Object> response = Response.fail(ResponseCodeEnum.FAIL,"");
+                        responseMessage.setData(response);
+                        log.error("连接失效，请求无法发送");
                     }
                 }
                 ctx.writeAndFlush(responseMessage).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
@@ -71,7 +68,7 @@ public class ServerHandler extends SimpleChannelInboundHandler {
         if (evt instanceof IdleStateEvent) {
             IdleState state = ((IdleStateEvent) evt).state();
             if (state == IdleState.READER_IDLE) {
-                log.info("idle check happen, so close the connection");
+                log.info("心跳检测失败，断开连接");
                 ctx.close();
             }
         } else {
@@ -81,7 +78,7 @@ public class ServerHandler extends SimpleChannelInboundHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        log.error("server catch exception");
+        log.error("服务提供端异常");
         cause.printStackTrace();
         ctx.close();
     }

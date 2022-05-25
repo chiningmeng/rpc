@@ -7,6 +7,7 @@ import com.whc.provider.ServiceProvider;
 import com.whc.provider.impl.ZkServiceProviderImpl;
 import com.whc.remoting.transport.codec.MessageDecoder;
 import com.whc.remoting.transport.codec.MessageEncoder;
+import com.whc.utils.IpAddressUtils;
 import com.whc.utils.RuntimeUtil;
 import com.whc.utils.ThreadPoolFactoryUtil;
 import io.netty.bootstrap.ServerBootstrap;
@@ -14,6 +15,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -38,9 +40,11 @@ public class NettyServer {
     @SneakyThrows
     public void start() {
         CustomShutdownHook.getCustomShutdownHook().clearAll();
-        String host = InetAddress.getLocalHost().getHostAddress();
+        String host = IpAddressUtils.getIpAddress();
+        //boss负责ServerSocketChannel上的accept事件
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
+        //将耗时较长的业务处理操作放在这，而不使用worker的，让worker只负责socketChannel上的读写
         DefaultEventExecutorGroup serviceHandlerGroup = new DefaultEventExecutorGroup(
                 RuntimeUtil.cpus() * 2,
                 ThreadPoolFactoryUtil.createThreadFactory("service-handler-group", false)
@@ -54,15 +58,14 @@ public class NettyServer {
                     // 是否开启 TCP 底层心跳机制
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     //表示系统用于临时存放已完成三次握手的请求的队列的最大长度,如果连接建立频繁，服务器处理创建新连接较慢，可以适当调大这个参数
-                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .option(ChannelOption.SO_BACKLOG, Integer.MAX_VALUE)
                     .handler(new LoggingHandler(LogLevel.INFO))
                     // 当客户端第一次进行请求的时候才会进行初始化
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                    .childHandler(new ChannelInitializer<NioSocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel ch) {
-                            // 30 秒之内没有收到客户端请求的话就关闭连接
+                        protected void initChannel(NioSocketChannel ch) {
                             ChannelPipeline p = ch.pipeline();
-                            p.addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS));
+                            p.addLast(new IdleStateHandler(15, 0, 0, TimeUnit.SECONDS));
                             p.addLast(new MessageEncoder());
                             p.addLast(new MessageDecoder());
                             p.addLast(serviceHandlerGroup, new ServerHandler());
@@ -74,7 +77,7 @@ public class NettyServer {
             // 等待服务端监听端口关闭
             f.channel().closeFuture().sync();
         } catch (InterruptedException e) {
-            log.error("occur exception when start server:", e);
+            log.error("启动服务失败:", e);
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();

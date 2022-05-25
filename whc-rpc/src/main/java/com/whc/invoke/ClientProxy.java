@@ -1,4 +1,4 @@
-package com.whc.proxy;
+package com.whc.invoke;
 
 import com.whc.config.RpcServiceConfig;
 import com.whc.enums.WhereEnum;
@@ -8,7 +8,6 @@ import com.whc.exception.RpcException;
 import com.whc.monitor.Monitor;
 import com.whc.monitor.time.ClientTimeLine;
 import com.whc.monitor.time.TimeLine;
-import com.whc.remoting.constants.RpcConstants;
 import com.whc.remoting.dto.Request;
 import com.whc.remoting.dto.Response;
 import com.whc.remoting.transport.RequestTransport;
@@ -21,7 +20,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 /**
  * 动态代理类
@@ -29,20 +27,20 @@ import java.util.concurrent.ExecutionException;
  * 隐藏客户端与服务端间通信的细节
  */
 @Slf4j
-public class RpcClientProxy implements InvocationHandler {
+public class ClientProxy implements InvocationHandler {
 
     private static final String INTERFACE_NAME = "interfaceName";
 
     private final RequestTransport requestTransport;
     private final RpcServiceConfig serviceConfig;
 
-    public RpcClientProxy(RequestTransport requestTransport, RpcServiceConfig serviceConfig) {
+    public ClientProxy(RequestTransport requestTransport, RpcServiceConfig serviceConfig) {
         this.requestTransport = requestTransport;
         this.serviceConfig = serviceConfig;
     }
 
 
-    public RpcClientProxy(RequestTransport requestTransport) {
+    public ClientProxy(RequestTransport requestTransport) {
         this.requestTransport = requestTransport;
         this.serviceConfig = new RpcServiceConfig();
     }
@@ -78,7 +76,6 @@ public class RpcClientProxy implements InvocationHandler {
         Monitor.addTimeLine(rpcRequest.getRequestId(), timeLine);
 
         if (requestTransport instanceof NettyClient) {
-            //todo CompletableFuture
             long phaseStarTimeStamp = System.currentTimeMillis();
             CompletableFuture<Response<Object>> completableFuture = (CompletableFuture<Response<Object>>) requestTransport.sendRpcRequest(rpcRequest);
             response = completableFuture.get();

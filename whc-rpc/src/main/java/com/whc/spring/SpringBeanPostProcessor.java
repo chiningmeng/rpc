@@ -7,10 +7,8 @@ import com.whc.extensions.ExtensionLoader;
 import com.whc.factory.SingletonFactory;
 import com.whc.provider.ServiceProvider;
 import com.whc.provider.impl.ZkServiceProviderImpl;
-import com.whc.proxy.RpcClientProxy;
+import com.whc.invoke.ClientProxy;
 import com.whc.remoting.transport.RequestTransport;
-import com.whc.remoting.transport.server.NettyServer;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -39,12 +37,12 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
                 RpcServiceConfig rpcServiceConfig = RpcServiceConfig.builder()
                         .group(rpcReference.group())
                         .version(rpcReference.version()).build();
-                RpcClientProxy rpcClientProxy = new RpcClientProxy(rpcClient, rpcServiceConfig);
+                ClientProxy rpcClientProxy = new ClientProxy(rpcClient, rpcServiceConfig);
                 //为客户端调用的 服务类 做动态代理
                 Object clientProxy = rpcClientProxy.getProxy(declaredField.getType());
                 declaredField.setAccessible(true);
                 try {
-                    //将指定对象变量上此 Field 对象表示的字段设置为指定的新值.
+                    //将指定对象变量上此 Field 对象表示的字段设置为指定的新值
                     declaredField.set(bean, clientProxy);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();

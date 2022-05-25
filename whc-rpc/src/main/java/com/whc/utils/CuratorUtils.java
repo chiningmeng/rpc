@@ -29,23 +29,23 @@ public final class CuratorUtils {
     private static final Map<String, List<String>> SERVICE_ADDRESS_MAP = new ConcurrentHashMap<>();
     private static final Set<String> REGISTERED_PATH_SET = ConcurrentHashMap.newKeySet();
     private static CuratorFramework zkClient;
-    private static final String DEFAULT_ZOOKEEPER_ADDRESS = "82.157.50.170:2181";
+    private static final String DEFAULT_ZOOKEEPER_ADDRESS = "43.128.179.6:2181,43.152.213.36:2181,43.152.213.207:2181";
 
     private CuratorUtils() {
     }
 
     /**
-     * 创建 pezookeeper 的 persistent nodes
+     * 创建 pezookeeper 的 临时节点
      *
      * @param zkClient
      * @param path
      */
-    public static void createPersistentNode(CuratorFramework zkClient, String path) {
+    public static void createNode(CuratorFramework zkClient, String path) {
         try {
             if (REGISTERED_PATH_SET.contains(path) || zkClient.checkExists().forPath(path) != null) {
                 log.info("The node already exists. The node is:[{}]", path);
             } else {
-                zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(path);
+                zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path);
                 log.info("The node was created successfully. The node is:[{}]", path);
             }
             REGISTERED_PATH_SET.add(path);

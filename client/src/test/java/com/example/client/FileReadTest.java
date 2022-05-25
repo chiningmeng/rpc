@@ -13,7 +13,7 @@ public class FileReadTest {
     @Test
     public void test(){
         File path = new File(ResourceUtils.getURL("classpath:").getPath());
-        String fileName = path.getAbsolutePath() + "/static/BigFile-2kb.txt";
+        String fileName = path.getAbsolutePath() + "/BigFile-2kb.txt";
         String content = new String(Files.readAllBytes(Paths.get(fileName)));
         System.out.println(content);
 
